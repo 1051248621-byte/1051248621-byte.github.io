@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中保双语学习</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #FF69B4; /* 鲜艳的粉红色 */
+            --light-color: #f8f9fa;
+            --text-color: #333;
+            --bg-gradient: linear-gradient(135deg, #FFB6C1 0%, #FFC0CB 100%); /* 柔和的粉色渐变 */
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+        }
+        
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        header {
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: cover;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+            position: relative;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            font-weight: 300;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .dialogue-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .dialogue {
+            background-color: white;
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            border-left: 5px solid var(--primary-color);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .dialogue::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s ease;
+        }
+        
+        .dialogue:hover {
+            transform: translateY(-3px);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        .dialogue:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .section-title {
+            font-size: 1.6rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-color);
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--accent-color);
+        }
+        
+        .sentence-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            margin-bottom: 12px;
+            justify-content: flex-start;
+        }
+        
+        .char-block {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 3px;
+            position: relative;
+            transition: transform 0.2s ease;
+        }
+        
+        .char-block:hover {
+            transform: translateY(-3px);
+        }
+        
+        .pinyin {
+            font-size: 13px;
+            color: var(--accent-color);
+            margin-bottom: 3px;
+            height: 18px;
+            display: flex;
+            align-items: flex-end;
+            font-weight: 500;
+        }
+        
+        .hanzi {
+            font-size: 22px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 2px 4px;
+            border-radius: 4px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+        }
+        
+        .hanzi:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .tooltiptext {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--accent-color);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            white-space: nowrap;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .tooltiptext::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: var(--accent-color);
+        }
+        
+        .hanzi:hover .tooltiptext {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .bulgarian {
+            font-size: 17px;
+            color: var(--primary-color);
+            font-style: italic;
+            text-align: left;
+            margin-top: 12px;
+            padding: 10px 15px;
+            background-color: rgba(52, 152, 219, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .play-btn {
+            cursor: pointer;
+            background: linear-gradient(to right, var(--accent-color), #FF1493);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 15px;
+            font-size: 14px;
+            margin-left: 15px;
+            transition: all 0.3s ease;
+            height: 32px;
+            align-self: flex-end;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .play-btn:hover {
+            background: linear-gradient(to right, #FF1493, #C71585);
+            transform: translateY(-2px);
+        }
+        
+        .expression-title {
+            font-size: 1.4rem;
+            color: var(--accent-color);
+            margin: 40px 0 15px;
+            font-weight: 600;
+            position: relative;
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 15px 0;
+            border-top: 2px dashed rgba(255, 105, 180, 0.3);
+            border-bottom: 2px dashed rgba(255, 105, 180, 0.3);
+        }
+        
+        .expression-title::before {
+            content: '💬';
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .example-container {
+            background: linear-gradient(to right, #FFF0F5, #FFE4E1);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid var(--accent-color);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 105, 180, 0.1);
+        }
+        
+        .example-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M30,20 Q50,0 70,20 T90,20" fill="none" stroke="rgba(255,105,180,0.2)" stroke-width="2"/></svg>');
+            background-size: contain;
+            opacity: 0.5;
+        }
+        
+        .example-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .example-title::before {
+            content: '📝';
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+            font-size: 15px;
+            border-top: 1px solid #eee;
+            background-color: var(--light-color);
+            position: relative;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .dialogue {
+                padding: 20px;
+            }
+            
+            .pinyin {
+                font-size: 12px;
+            }
+            
+            .hanzi {
+                font-size: 20px;
+                height: 30px;
+            }
+            
+            .bulgarian {
+                font-size: 16px;
+            }
+                        
+            .play-btn {
+                height: 30px;
+                padding: 6px 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .sentence-container {
+                justify-content: center;
+            }
+            
+            .char-block {
+                margin: 0 2px;
+            }
+            
+            .pinyin {
+                font-size: 11px;
+            }
+            
+            .hanzi {
+                font-size: 18px;
+                height: 28px;
+            }
+            
+            .play-btn {
+                margin-top: 10px;
+                margin-left: 0;
+                width: 100%;
+                justify-content: center;
+            }
+        }      
+
+ .top-left-img {
+    position: fixed;
+    top: 20px;      /* 距离顶部 20px */
+    left: 20px;     /* 距离左侧 20px */
+}
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .dialogue {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+        
+        .dialogue:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        
+        .dialogue:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+        
+        .dialogue:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+        
+        .dialogue:nth-child(5) {
+            animation-delay: 0.4s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>买暖和的衣服</h1>
+            <p class="subtitle">mǎi nuǎn huo de yī fu</p>
+           <p class="subtitle">Купувам топли дрехи</p>
+        </header>
+        
+        <div class="content">
+            <div class="dialogue-container">
+                <!-- 1 -->
+                <div class="dialogue">
+                    <div class="sentence-container">
+                        <span class="char-block"><span class="pinyin">wǒ</span><span class="hanzi">我<span class="tooltiptext">аз</span></span></span>
+                        <span class="char-block"><span class="pinyin">xiǎng</span><span class="hanzi">想<span class="tooltiptext">искам</span></span></span>
+                        <span class="char-block"><span class="pinyin">mǎi</span><span class="hanzi">买<span class="tooltiptext">купувам</span></span></span>
+                        <span class="char-block"><span class="pinyin">yí</span><span class="hanzi">一<span class="tooltiptext">един</span></span></span>
+                        <span class="char-block"><span class="pinyin">jiàn</span><span class="hanzi">件<span class="tooltiptext">(бройка)(за дрехи)</span></span></span>
+                        <span class="char-block"><span class="pinyin">jiá kè</span><span class="hanzi">夹克<span class="tooltiptext">яке</span></span></span>
+                        <span class="hanzi">。</span>
+                        <button class="play-btn" onclick="playSentenceAudio('mainuanhuodeyifu_audio/mainuanhuodeyifu1.mp3')">▶ 播放</button>
+                    </div>
+                    <span class="bulgarian">Искам да купя яке.</span>
+                </div>
+                
+                <!-- 2 -->
+                <div class="dialogue">
+                    <div class="sentence-container">
+                        <span class="char-block"><span class="pinyin">shén me yàng de</span><span class="hanzi">什么样的<span class="tooltiptext">какво</span></span></span>
+                        <span class="hanzi">？</span>
+                        <button class="play-btn" onclick="playSentenceAudio('mainuanhuodeyifu_audio/mainuanhuodeyifu2.mp3')">▶ 播放</button>
+                    </div>
+                    <span class="bulgarian">Какво яке?</span>
+                </div>
+
+                <!-- 3 -->
+                <div class="dialogue">
+                    <div class="sentence-container">
+                        <span class="char-block"><span class="pinyin">fáng fēng de</span><span class="hanzi">防风的<span class="tooltiptext">предпазващ от вятър</span></span></span>
+                        <span class="hanzi">。</span>
+                        <span class="char-block"><span class="pinyin">zuì jìn</span><span class="hanzi">最近<span class="tooltiptext">напоследък</span></span></span>
+                        <span class="char-block"><span class="pinyin">zǒng shì</span><span class="hanzi">总是<span class="tooltiptext">винаги</span></span></span>
+                        <span class="char-block"><span class="pinyin">guā fēng</span><span class="hanzi">刮风<span class="tooltiptext">духа вятър</span></span></span>
+                        <span class="hanzi">，</span>
+                        <span class="char-block"><span class="pinyin">lěng</span><span class="hanzi">冷<span class="tooltiptext">студен</span></span></span>
+                        <span class="char-block"><span class="pinyin">sǐ</span><span class="hanzi">死<span class="tooltiptext">смърт</span></span></span>
+                        <span class="char-block"><span class="pinyin">le</span><span class="hanzi">了<span class="tooltiptext"> </span></span></span>
+                        <span class="hanzi">！</span>
+                        <button class="play-btn" onclick="playSentenceAudio('mainuanhuodeyifu_audio/mainuanhuodeyifu3.mp3')">▶ 播放</button>
+                    </div>
+                    <span class="bulgarian">Ветроустойчивото. Напоследък постоянно духа вятър, ужасно е студено!</span>
+                </div>
+                
+                <!-- 4 -->
+                <div class="dialogue">
+                    <div class="sentence-container">
+                        <span class="char-block"><span class="pinyin">shì</span><span class="hanzi">是<span class="tooltiptext">да</span></span></span>
+                        <span class="char-block"><span class="pinyin">a</span><span class="hanzi">啊<span class="tooltiptext"> </span></span></span>
+                        <span class="hanzi">，</span>
+                        <span class="char-block"><span class="pinyin">jīn tiān</span><span class="hanzi">今天<span class="tooltiptext">днес</span></span></span>
+                        <span class="char-block"><span class="pinyin">zuì dī</span><span class="hanzi">最低<span class="tooltiptext">най-нисък</span></span></span>
+                        <span class="char-block"><span class="pinyin">qì wēn</span><span class="hanzi">气温<span class="tooltiptext">температура на въздуха</span></span></span>
+                        <span class="char-block"><span class="pinyin">dōu</span><span class="hanzi">都<span class="tooltiptext">дори</span></span></span>
+                        <span class="char-block"><span class="pinyin">líng xià</span><span class="hanzi">零下<span class="tooltiptext">под нулата</span></span></span>
+                        <span class="char-block"><span class="pinyin">liù</span><span class="hanzi">六<span class="tooltiptext">шест</span></span></span>
+                        <span class="char-block"><span class="pinyin">dù</span><span class="hanzi">度<span class="tooltiptext">градус</span></span></span>
+                        <span class="char-block"><span class="pinyin">le</span><span class="hanzi">了<span class="tooltiptext"></span></span></span>
+                        <span class="hanzi">！</span>
+                        <button class="play-btn" onclick="playSentenceAudio('mainuanhuodeyifu_audio/mainuanhuodeyifu4.mp3')">▶ 播放</button>
+                    </div>
+                    <span class="bulgarian">Да, днес минималната температура е дори минус 6 градуса!</span>
+                </div>
+                
+                <!-- 5 -->
+                <div class="dialogue">
+                    <div class="sentence-container">
+                        <span class="char-block"><span class="pinyin">nǐ</span><span class="hanzi">你<span class="tooltiptext">ти</span></span></span>
+                        <span class="char-block"><span class="pinyin">kàn</span><span class="hanzi">看<span class="tooltiptext">гледай</span></span></span>
+                        <span class="hanzi">，</span>
+                        <span class="char-block"><span class="pinyin">zhè</span><span class="hanzi">这<span class="tooltiptext">този</span></span></span>
+                        <span class="char-block"><span class="pinyin">kuǎn</span><span class="hanzi">款<span class="tooltiptext">модел</span></span></span>
+                        <span class="char-block"><span class="pinyin">pí jiá kè</span><span class="hanzi">皮夹克<span class="tooltiptext">кожено яке</span></span></span>
+                        <span class="char-block"><span class="pinyin">tǐng bú cuò de</span><span class="hanzi">挺不错的<span class="tooltiptext">доста добрo; не е зле</span></span></span>
+                        <span class="hanzi">，</span>
+                        <span class="char-block"><span class="pinyin">cái zhì</span><span class="hanzi">材质<span class="tooltiptext">материал</span></span></span>
+                        <span class="char-block"><span class="pinyin">shì</span><span class="hanzi">是<span class="tooltiptext">е</span></span></span>
+                        <span class="char-block"><span class="pinyin">rén zào gé</span><span class="hanzi">人造革<span class="tooltiptext">изкуствена кожа</span></span></span>
+                        <span class="char-block"><span class="pinyin">de</span><span class="hanzi">的<span class="tooltiptext"></span></span></span>
+                        <span class="hanzi">，</span>
+                        <span class="char-block"><span class="pinyin">fáng fēng</span><span class="hanzi">防风<span class="tooltiptext">предпазващ от вятър</span></span></span>
+                        <span class="char-block"><span class="pinyin">yòu</span><span class="hanzi">又<span class="tooltiptext">пак; и</span></span></span>
+                        <span class="char-block"><span class="pinyin">bǎo nuǎn</span><span class="hanzi">保暖<span class="tooltiptext">запазващ топлината</span></span></span>
+                        <span class="hanzi">。</span>
+                        <button class="play-btn" onclick="playSentenceAudio('mainuanhuodeyifu_audio/mainuanhuodeyifu5.mp3')">▶ 播放</button>
+                    </div>
+                    <span class="bulgarian">Виж, това кожено яке е доста добро, от изкуствена кожа) материал, хем ветроустойчиво хем топло.</span>
+                </div>
+
+                <!-- 6 -->
+                <div class="dialogue">
+                    <div class="sentence-container">
+                        <span class="char-block"><span class="pinyin">hǎo</span><span class="hanzi">好<span class="tooltiptext">много</span></span></span>
+                        <span class="char-block"><span class="pinyin">kù</span><span class="hanzi">酷<span class="tooltiptext">готино</span></span></span>
+                        <span class="char-block"><span class="pinyin">a</span><span class="hanzi">啊<span class="tooltiptext"></span></span></span>
+                        <span class="hanzi">！</span>
+                        <span class="char-block"><span class="pinyin">jiù shi</span><span class="hanzi">就是<span class="tooltiptext">само че</span></span></span>
+                        <span class="char-block"><span class="pinyin">yǒu dian</span><span class="hanzi">有点<span class="tooltiptext">малко е ...</span></span></span>
+                        <span class="char-block"><span class="pinyin">báo</span><span class="hanzi">薄<span class="tooltiptext">тънко</span></span></span>
+                        <span class="hanzi">……</span>
+                        <span class="char-block"><span class="pinyin">yǒu méi yǒu</span><span class="hanzi">有没有<span class="tooltiptext">има ли</span></span></span>
+                        <span class="char-block"><span class="pinyin">hòu</span><span class="hanzi">厚<span class="tooltiptext">дебели</span></span></span>
+                        <span class="char-block"><span class="pinyin">de</span><span class="hanzi">的<span class="tooltiptext"></span></span></span>
+                        <span class="hanzi">？</span>
+                        <button class="play-btn" onclick="playSentenceAudio('mainuanhuodeyifu_audio/mainuanhuodeyifu6.mp3')">▶ 播放</button>
+                    </div>
+                    <span class="bulgarian">Толкова стилнo! Само че е малко тънко……Има ли дебели?</span>
+                </div>
+
+                <!-- 7 -->
+                <div class="dialogue">
+                    <div class="sentence-container">
+                        <span class="char-block"><span class="pinyin">méi</span><span class="hanzi">没<span class="tooltiptext">няма</span></span></span>
+                        <span class="char-block"><span class="pinyin">le</span><span class="hanzi">了<span class="tooltiptext"></span></span></span>
+                        <span class="hanzi">，</span>
+                        <span class="char-block"><span class="pinyin">mài</span><span class="hanzi">卖<span class="tooltiptext">продавам</span></span></span>
+                        <span class="char-block"><span class="pinyin">wán</span><span class="hanzi">完<span class="tooltiptext">свършвам</span></span></span>
+                        <span class="char-block"><span class="pinyin">le</span><span class="hanzi">了<span class="tooltiptext"></span></span></span>
+                        <span class="hanzi">。</span>
+                        <button class="play-btn" onclick="playSentenceAudio('mainuanhuodeyifu_audio/mainuanhuodeyifu7.mp3')">▶ 播放</button>
+                    </div>
+                    <span class="bulgarian">Няма вече, свършиха / всички са продадени вече.</span>
+                </div>
+
+                <!-- 8 -->
+                <div class="dialogue">
+                    <div class="sentence-container">
+                        <span class="char-block"><span class="pinyin">bú guò</span><span class="hanzi">不过<span class="tooltiptext">обаче</span></span></span>
+                        <span class="char-block"><span class="pinyin">nà biān</span><span class="hanzi">那边<span class="tooltiptext">там</span></span></span>
+                        <span class="char-block"><span class="pinyin">yǒu</span><span class="hanzi">有<span class="tooltiptext">има</span></span></span>
+                        <span class="char-block"><span class="pinyin">pài kè fú</span><span class="hanzi">派克服<span class="tooltiptext">парка</span></span></span>
+                        <span class="hanzi">，</span>
+                        <span class="char-block"><span class="pinyin">dōu</span><span class="hanzi">都<span class="tooltiptext">(наречие)(всички)</span></span></span>
+                        <span class="char-block"><span class="pinyin">shì</span><span class="hanzi">是<span class="tooltiptext">са</span></span></span>
+                        <span class="char-block"><span class="pinyin">fáng shuǐ</span><span class="hanzi">防水<span class="tooltiptext">водоустойчив</span></span></span>
+                        <span class="char-block"><span class="pinyin">miàn liào</span><span class="hanzi">面料<span class="tooltiptext">материал</span></span></span>
+                        <span class="hanzi">，</span>
+                        <span class="char-block"><span class="pinyin">xià yǔ</span><span class="hanzi">下雨<span class="tooltiptext">вали дъжд</span></span></span>
+                        <span class="char-block"><span class="pinyin">yě</span><span class="hanzi">也<span class="tooltiptext">също</span></span></span>
+                        <span class="char-block"><span class="pinyin">néng</span><span class="hanzi">能<span class="tooltiptext">може</span></span></span>
+                        <span class="char-block"><span class="pinyin">chuān</span><span class="hanzi">穿<span class="tooltiptext">нося/обличам</span></span></span>
+                        <span class="hanzi">。</span>
+                        <button class="play-btn" onclick="playSentenceAudio('mainuanhuodeyifu_audio/mainuanhuodeyifu8.mp3')">▶ 播放</button>
+                    </div>
+                    <span class="bulgarian">Но ей там има парки, всичките са от водоустойчив материал, може да се носят и при дъжд.</span>
+                </div>
+
+                <!-- 9 -->
+                <div class="dialogue">
+                    <div class="sentence-container">
+                        <span class="char-block"><span class="pinyin">tài</span><span class="hanzi">太<span class="tooltiptext">прекалено</span></span></span>
+                        <span class="char-block"><span class="pinyin">hǎo</span><span class="hanzi">好<span class="tooltiptext">добро</span></span></span>
+                        <span class="char-block"><span class="pinyin">le</span><span class="hanzi">了<span class="tooltiptext"></span></span></span>
+                        <span class="hanzi">，</span>
+                        <span class="char-block"><span class="pinyin">xiè xie</span><span class="hanzi">谢谢<span class="tooltiptext">благодаря</span></span></span>
+                        <span class="char-block"><span class="pinyin">nǐ de</span><span class="hanzi">你的<span class="tooltiptext">твоя</span></span></span>
+                        <span class="char-block"><span class="pinyin">tuī jiàn</span><span class="hanzi">推荐<span class="tooltiptext">препоръка</span></span></span>
+                        <span class="hanzi">！</span>
+                        <button class="play-btn" onclick="playSentenceAudio('mainuanhuodeyifu_audio/mainuanhuodeyifu9.mp3')">▶ 播放</button>
+                    </div>
+                    <span class="bulgarian">Това е яко! Благодаря за препоръката!</span>
+                </div>
+
+                <!-- 10 -->
+                <div class="dialogue">
+                    <div class="sentence-container">
+                        <span class="char-block"><span class="pinyin">duì le</span><span class="hanzi">对了<span class="tooltiptext">между другото</span></span></span>
+                        <span class="hanzi">，</span>
+                        <span class="char-block"><span class="pinyin">yǒu méi yǒu</span><span class="hanzi">有没有<span class="tooltiptext">има ли</span></span></span>
+                        <span class="char-block"><span class="pinyin">jiā</span><span class="hanzi">加<span class="tooltiptext">добавям</span></span></span>
+                        <span class="char-block"><span class="pinyin">róng</span><span class="hanzi">绒<span class="tooltiptext">пух</span></span></span>
+                        <span class="char-block"><span class="pinyin">de</span><span class="hanzi">的<span class="tooltiptext"></span></span></span>
+                        <span class="char-block"><span class="pinyin">dà yī</span><span class="hanzi">大衣<span class="tooltiptext">палто</span></span></span>
+                        <span class="char-block"><span class="pinyin">hé</span><span class="hanzi">和<span class="tooltiptext">и</span></span></span>
+                        <span class="char-block"><span class="pinyin">bàn</span><span class="hanzi">半<span class="tooltiptext">полу-</span></span></span>
+                        <span class="char-block"><span class="pinyin">gāo</span><span class="hanzi">高<span class="tooltiptext">висока</span></span></span>
+                        <span class="char-block"><span class="pinyin">lǐng</span><span class="hanzi">领<span class="tooltiptext">яка (яка：领子，衣领)</span></span></span>
+                        <span class="char-block"><span class="pinyin">de</span><span class="hanzi">的<span class="tooltiptext"></span></span></span>
+                        <span class="char-block"><span class="pinyin">yáng máo</span><span class="hanzi">羊毛<span class="tooltiptext">вълна</span></span></span>
+                        <span class="char-block"><span class="pinyin">shān</span><span class="hanzi">衫<span class="tooltiptext"></span></span></span>
+                        <span class="hanzi">？</span>
+                        <button class="play-btn" onclick="playSentenceAudio('mainuanhuodeyifu_audio/mainuanhuodeyifu10.mp3')">▶ 播放</button>
+                    </div>
+                    <span class="bulgarian">Между другото, има ли палта с подплата от пух и вълнени пуловери с полу-висока яка?</span>
+                </div>
+
+                <!-- 11 -->
+                <div class="dialogue">
+                    <div class="sentence-container">
+                        <span class="char-block"><span class="pinyin">dōu</span><span class="hanzi">都<span class="tooltiptext">(наречние)(всички)</span></span></span>
+                        <span class="char-block"><span class="pinyin">zài</span><span class="hanzi">在<span class="tooltiptext">са в</span></span></span>
+                        <span class="char-block"><span class="pinyin">nà</span><span class="hanzi">那<span class="tooltiptext">онова</span></span></span>
+                        <span class="char-block"><span class="pinyin">biān</span><span class="hanzi">边<span class="tooltiptext">страна</span></span></span>
+                        <span class="hanzi">！</span>
+                        <span class="char-block"><span class="pinyin">zǒu</span><span class="hanzi">走<span class="tooltiptext">вървим, да тръгнем</span></span></span>
+                        <span class="hanzi">，</span>
+                        <span class="char-block"><span class="pinyin">wǒ</span><span class="hanzi">我<span class="tooltiptext">аз</span></span></span>
+                        <span class="char-block"><span class="pinyin">dài</span><span class="hanzi">带<span class="tooltiptext">водя</span></span></span>
+                        <span class="char-block"><span class="pinyin">nǐ</span><span class="hanzi">你<span class="tooltiptext">теб</span></span></span>
+                        <span class="char-block"><span class="pinyin">qù</span><span class="hanzi">去<span class="tooltiptext">отиваш</span></span></span>
+                        <span class="hanzi">。</span>
+                        <button class="play-btn" onclick="playSentenceAudio('mainuanhuodeyifu_audio/mainuanhuodeyifu11.mp3')">▶ 播放</button>
+                    </div>
+                    <span class="bulgarian">Всички са ей там! Ела, ще те заведа.</span>
+                </div>
+            </div>
+        </div>
+      
+
+
+                <div class="dialogue">
+                    <div class="section-title">要风度也要温度｜理性的冲锋衣选购指南</div>
+                    <style>
+
+a:link {text-decoration:none;}    /* unvisited link */
+a:visited {text-decoration:none;} /* visited link */
+a:hover {text-decoration:underline;}   /* mouse over link */
+a:active {text-decoration:underline;}  /* selected link */
+</style>
+
+<body>
+<p><b><a href="https://post.smzdm.com/p/ar68dvqg/" target="_blank">https://post.smzdm.com/p/ar68dvqg/" target</a></b></p>
+</body>
+
+                    <div class="sentence-container">
+                        <span class="char-block"><span class="pinyin">yìng ké</span><span class="hanzi">硬壳<span class="tooltiptext">хардшел</span></span></span>
+                        <span class="char-block"><span class="pinyin">de</span><span class="hanzi">的<span class="tooltiptext"></span></span></span>
+                        <span class="char-block"><span class="pinyin">gōng néng</span><span class="hanzi">功能<span class="tooltiptext">функция</span></span></span>
+                        <span class="char-block"><span class="pinyin">lèi sì</span><span class="hanzi">类似<span class="tooltiptext">е подобна на</span></span></span>
+                        <span class="char-block"><span class="pinyin">yǔ yī</span><span class="hanzi">雨衣<span class="tooltiptext">дъждобран</span></span></span>
+                        <span class="hanzi">，</span>
+                        <span class="char-block"><span class="pinyin">bǎo zhèng</span><span class="hanzi">保证<span class="tooltiptext">осигурява</span></span></span>
+                        <span class="char-block"><span class="pinyin">jí xiàn</span><span class="hanzi">极限<span class="tooltiptext">екстремни</span></span></span>
+                        <span class="char-block"><span class="pinyin">huán jìng</span><span class="hanzi">环境<span class="tooltiptext">среда, околна среда</span></span></span>
+                        <span class="char-block"><span class="pinyin">xià</span><span class="hanzi">下<span class="tooltiptext">в ...(условия)</span></span></span>
+                        <span class="char-block"><span class="pinyin">fáng fēng</span><span class="hanzi">防风<span class="tooltiptext">защита от вятър</span></span></span>
+                        <span class="char-block"><span class="pinyin">fáng shuǐ</span><span class="hanzi">防水<span class="tooltiptext">защита от вода</span></span></span>
+                        <span class="hanzi">。</span>
+                    </div>
+                    <span class="bulgarian">Функцията на хардшел е подобна на дъждобран - осигурява защита от вятър и вода в екстремни условия.</span>
+                    
+                    <div class="sentence-container" style="margin-top: 20px;">
+                        <span class="char-block"><span class="pinyin">yìng ké</span><span class="hanzi">硬壳<span class="tooltiptext">харшел</span></span></span>
+                        <span class="char-block"><span class="pinyin">xiāng bǐ</span><span class="hanzi">相比<span class="tooltiptext">спрямо</span></span></span>
+                        <span class="char-block"><span class="pinyin">yǔ yī</span><span class="hanzi">雨衣<span class="tooltiptext">дъждобран</span></span></span>
+                        <span class="char-block"><span class="pinyin">zuì dà de</span><span class="hanzi">最大的<span class="tooltiptext">най-голямото</span></span></span>
+                        <span class="char-block"><span class="pinyin">yōu shì</span><span class="hanzi">优势<span class="tooltiptext">предимство</span></span></span>
+                        <span class="char-block"><span class="pinyin">jiù shi</span><span class="hanzi">就是<span class="tooltiptext">е</span></span></span>
+                        <span class="char-block"><span class="pinyin">qīng biàn</span><span class="hanzi">轻便<span class="tooltiptext">лека и удобна (удобно: 方便)</span></span></span>
+                        <span class="char-block"><span class="pinyin">hé</span><span class="hanzi">和<span class="tooltiptext">и</span></span></span>
+                        <span class="char-block"><span class="pinyin">tòu qì</span><span class="hanzi">透气<span class="tooltiptext">дишаща</span></span></span>
+                        <span class="hanzi">，</span>
+                        <span class="char-block"><span class="pinyin">zhè</span><span class="hanzi">这<span class="tooltiptext">тези</span></span></span>
+                        <span class="char-block"><span class="pinyin">liǎng</span><span class="hanzi">两<span class="tooltiptext">две</span></span></span>
+                        <span class="char-block"><span class="pinyin">diǎn</span><span class="hanzi">点<span class="tooltiptext">точка</span></span></span>
+                        <span class="char-block"><span class="pinyin">duì yú</span><span class="hanzi">对于<span class="tooltiptext">за</span></span></span>
+                        <span class="char-block"><span class="pinyin">hù wài</span><span class="hanzi">户外<span class="tooltiptext">на открито</span></span></span>
+                        <span class="char-block"><span class="pinyin">yùn dòng</span><span class="hanzi">运动<span class="tooltiptext">спорт</span></span></span>
+                        <span class="char-block"><span class="pinyin">lái shuō</span><span class="hanzi">来说<span class="tooltiptext">(对于……来说：за ...)</span></span></span>
+                        <span class="char-block"><span class="pinyin">zhì guān</span><span class="hanzi">至关<span class="tooltiptext">изключително</span></span></span>
+                        <span class="char-block"><span class="pinyin">zhòng yào</span><span class="hanzi">重要<span class="tooltiptext">важно</span></span></span>
+                        <span class="hanzi">。</span>
+                    </div>
+                    <span class="bulgarian">Най-голямото му предимство спрямо дъждобрана е, че е лека и дишаща, а тези две качества са изключително важни за спорт на открито.</span>
+                </div>
+                
+                <div class="dialogue">
+                    <div class="expression-title">Популярен израз</div>
+                    
+                    <div class="sentence-container">
+                        <span class="char-block"><span class="pinyin">zhǐ yào</span><span class="hanzi">只要<span class="tooltiptext">само иска</span></span></span>
+                        <span class="char-block"><span class="pinyin">fēng dù</span><span class="hanzi">风度<span class="tooltiptext">стил</span></span></span>
+                        <span class="hanzi">，</span>
+                        <span class="char-block"><span class="pinyin">bú yào</span><span class="hanzi">不要<span class="tooltiptext">не и</span></span></span>
+                        <span class="char-block"><span class="pinyin">wēn dù</span><span class="hanzi">温度<span class="tooltiptext">температура</span></span></span>
+                    </div>
+                    <span class="bulgarian">Само иска стил, не и температура</span>
+                    
+                    <div class="sentence-container" style="margin-top: 20px;">
+                        <span class="char-block"><span class="pinyin">yòng lái</span><span class="hanzi">用来<span class="tooltiptext">използва се</span></span></span>
+                        <span class="char-block"><span class="pinyin">duì</span><span class="hanzi">对<span class="tooltiptext">за</span></span></span>
+                        <span class="char-block"><span class="pinyin">chuān de</span><span class="hanzi">穿得<span class="tooltiptext">облича се</span></span></span>
+                        <span class="char-block"><span class="pinyin">fēng dù piān piān</span><span class="hanzi">风度翩翩<span class="tooltiptext">стилно, изглежда много културно</span></span></span>
+                        <span class="char-block"><span class="pinyin">dàn</span><span class="hanzi">但<span class="tooltiptext">но</span></span></span>
+                        <span class="char-block"><span class="pinyin">bú zài yì</span><span class="hanzi">不在意<span class="tooltiptext">не му пука</span></span></span>
+                        <span class="char-block"><span class="pinyin">lěng bù lěng</span><span class="hanzi">冷不冷<span class="tooltiptext">дали е студено</span></span></span>
+                        <span class="char-block"><span class="pinyin">de</span><span class="hanzi">的<span class="tooltiptext"></span></span></span>
+                        <span class="char-block"><span class="pinyin">rén</span><span class="hanzi">人<span class="tooltiptext">човек</span></span></span>
+                        <span class="char-block"><span class="pinyin">kāi wán xiào</span><span class="hanzi">开玩笑<span class="tooltiptext">шегува се</span></span></span>
+                        <span class="hanzi">。</span>
+                    </div>
+                    <span class="bulgarian">Използва се да се шегува с някой, който се облича стилно, но не му пука дали му е студено.</span>
+                    
+                    <div class="example-container">
+                        <div class="example-title">例：</div>
+                        
+                        <div class="sentence-container">
+                            <span class="char-block"><span class="pinyin">nǚ'ér</span><span class="hanzi">女儿<span class="tooltiptext">дъщеря</span></span></span>
+                            <span class="hanzi">：</span>
+                            <span class="char-block"><span class="pinyin">mā</span><span class="hanzi">妈<span class="tooltiptext">мамо</span></span></span>
+                            <span class="hanzi">，</span>
+                            <span class="char-block"><span class="pinyin">wǒ</span><span class="hanzi">我<span class="tooltiptext">аз</span></span></span>
+                            <span class="char-block"><span class="pinyin">yíhuìr</span><span class="hanzi">一会儿<span class="tooltiptext">след малко</span></span></span>
+                            <span class="char-block"><span class="pinyin">chūmén</span><span class="hanzi">出门<span class="tooltiptext">излизам</span></span></span>
+                            <span class="char-block"><span class="pinyin">xiǎng</span><span class="hanzi">想<span class="tooltiptext">искам</span></span></span>
+                            <span class="char-block"><span class="pinyin">chuān</span><span class="hanzi">穿<span class="tooltiptext">облека</span></span></span>
+                            <span class="char-block"><span class="pinyin">zhè jiàn</span><span class="hanzi">这件<span class="tooltiptext">този</span></span></span>
+                            <span class="char-block"><span class="pinyin">piàoliang</span><span class="hanzi">漂亮<span class="tooltiptext">красив</span></span></span>
+                            <span class="char-block"><span class="pinyin">de</span><span class="hanzi">的<span class="tooltiptext"></span></span></span>
+                            <span class="char-block"><span class="pinyin">fēngyī</span><span class="hanzi">风衣<span class="tooltiptext">тренчкот</span></span></span>
+                            <span class="hanzi">！</span>
+                        </div>
+                        <span class="bulgarian">Дъщеря: Мамо, искам да облека този красив тренчкот, когато изляза след малко!</span>
+                        
+                        <div class="sentence-container" style="margin-top: 20px;">
+                            <span class="char-block"><span class="pinyin">mǔqīn</span><span class="hanzi">母亲<span class="tooltiptext">майка</span></span></span>
+                            <span class="hanzi">：</span>
+                            <span class="char-block"><span class="pinyin">nǐ</span><span class="hanzi">你<span class="tooltiptext">ти</span></span></span>
+                            <span class="char-block"><span class="pinyin">shì</span><span class="hanzi">是<span class="tooltiptext">си</span></span></span>
+                            <span class="char-block"><span class="pinyin">zhǐyào</span><span class="hanzi">"只要<span class="tooltiptext">"само искаш</span></span></span>
+                            <span class="char-block"><span class="pinyin">fēngdù</span><span class="hanzi">风度<span class="tooltiptext">стил</span></span></span>
+                            <span class="hanzi">，</span>
+                            <span class="char-block"><span class="pinyin">búyào</span><span class="hanzi">不要<span class="tooltiptext">не и</span></span></span>
+                            <span class="char-block"><span class="pinyin">wēn</span><span class="hanzi">温<span class="tooltiptext">топло</span></span></span>
+                            <span class="char-block"><span class="pinyin">dù</span><span class="hanzi">度<span class="tooltiptext">степен, градус</span></span></span>
+                            <span class="char-block"><span class="pinyin"></span><span class="hanzi">"<span class="tooltiptext">"</span></span></span>
+                            <span class="hanzi">？</span>
+                            <span class="char-block"><span class="pinyin">kuài</span><span class="hanzi">快<span class="tooltiptext">хайде</span></span></span>
+                            <span class="char-block"><span class="pinyin">qù</span><span class="hanzi">去<span class="tooltiptext">отиди</span></span></span>
+                            <span class="char-block"><span class="pinyin">huàn shàng</span><span class="hanzi">换上<span class="tooltiptext">преоблечи, облечи</span></span></span>
+                            <span class="char-block"><span class="pinyin">mián'ǎo</span><span class="hanzi">棉袄<span class="tooltiptext">памучно яке</span></span></span>
+                            <span class="hanzi">！</span>
+                        </div>
+                        <span class="bulgarian">Майка: Ти си такава „само искаш стил, не и топлина"? Хайде, върви и облечи памучното яке!</span>
+                    </div>
+                </div>
+            </div>
+    
+ <div class="top-left-img">
+<img src="data:image/png;base64,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" alt="装饰图" class="top-left-img">
+        </div>
+
+    <script>
+        function playSentenceAudio(filename) {
+            const audio = new Audio(filename);
+            audio.play().catch(e => {
+                console.log("音频播放失败: ", e);
+                alert("音频文件不存在或无法播放，请确保音频文件路径正确。");
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const dialogues = document.querySelectorAll('.dialogue');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            dialogues.forEach(dialogue => {
+                dialogue.style.opacity = '0';
+                dialogue.style.transform = 'translateY(20px)';
+                dialogue.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                observer.observe(dialogue);
+            });
+        });
+    </script>
+</body>
+</html>
